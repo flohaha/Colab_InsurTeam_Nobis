@@ -1,0 +1,448 @@
+{
+  "contentType": "application/vnd.gorules.decision",
+  "nodes": [
+    {
+      "name": "myRequest",
+      "id": "85fea211-3360-4c0e-9e8d-5d518520210a",
+      "position": {
+        "x": -430,
+        "y": -175
+      },
+      "type": "inputNode"
+    },
+    {
+      "name": "Date_Function",
+      "content": "/**\r\n * @param input\r\n * @param {{\r\n *  dayjs: import('dayjs')\r\n *  Big: import('big.js').BigConstructor\r\n * }} helpers\r\n */\r\nconst handler = (input, { dayjs, Big }) => {\r\n\r\nlet today = new Date().toISOString().slice(0, 10)\r\n\r\n// Example input date (you can replace this with any desired date)\r\nconst inputDateString = \"2024-03-01\"; // Format: \"YYYY-MM-DD\"\r\nconst inputDate = new Date(input.cancel_date);\r\n\r\n// Current date (now)\r\nconst currentDate = new Date();\r\n\r\n// Calculate the time difference in milliseconds\r\nconst timeDifferenceMs = inputDate.getTime() - currentDate.getTime();\r\n\r\n// Convert milliseconds to days\r\nconst daysDifference = Math.round(timeDifferenceMs / (1000 * 60 * 60 * 24));\r\n\r\nconsole.log(`Days between now and ${inputDateString}: ${daysDifference} days`);\r\nconsole.log(input.date);\r\n\r\n  return {\r\n    ...input,\r\n    today,\r\n    'daysfrominput':daysDifference\r\n  };\r\n}",
+      "id": "faf3d09c-0048-4623-87e6-812eb3f85488",
+      "position": {
+        "x": 260,
+        "y": 150
+      },
+      "type": "functionNode"
+    },
+    {
+      "name": "Claim_Type_Switch",
+      "content": {
+        "statements": [
+          {
+            "id": "30015f5e-720f-486a-a761-fb0649a579a2",
+            "condition": "claim== 'Cancel'"
+          },
+          {
+            "id": "cd332d62-4f78-4f08-bc7d-0e6d354d11b7",
+            "condition": "claim== 'Delay'"
+          },
+          {
+            "id": "a4a46d9d-0eff-4e51-8705-21dca21f2d67",
+            "condition": "claim== 'Loss'"
+          },
+          {
+            "id": "aee7a303-578b-4f95-a1d2-97cb2ca806ff",
+            "condition": ""
+          }
+        ],
+        "hitPolicy": "collect"
+      },
+      "id": "3100a64f-c255-461a-b0c4-24b5321f2fe8",
+      "position": {
+        "x": -315,
+        "y": 120
+      },
+      "type": "switchNode"
+    },
+    {
+      "name": "Decision_Table_Documents",
+      "content": {
+        "hitPolicy": "first",
+        "inputs": [
+          {
+            "id": "80c2364a-d75d-4a29-addc-e8682dcf069a",
+            "name": "Input",
+            "field": "claim",
+            "type": "expression",
+            "defaultValue": ""
+          },
+          {
+            "id": "3b873498-32d4-4768-b452-f74437dcae0d",
+            "name": "Input",
+            "field": "daysfrominput",
+            "type": "expression",
+            "defaultValue": ""
+          },
+          {
+            "id": "fa773a81-3d65-4fba-a3a7-905a8b1fd694",
+            "name": "Input",
+            "field": "cancel_reason",
+            "type": "expression",
+            "defaultValue": ""
+          },
+          {
+            "id": "0257c01e-6955-4a7f-ab95-35bbabbb24f9",
+            "name": "Input",
+            "field": "ppl_concerned",
+            "type": "expression",
+            "defaultValue": ""
+          }
+        ],
+        "outputs": [
+          {
+            "id": "562fbf68-e03f-404e-8c95-ea2c4c70aa8f",
+            "name": "Output",
+            "field": "message",
+            "type": "expression",
+            "defaultValue": ""
+          },
+          {
+            "id": "7fc7bfb9-53a2-4e13-8d29-905095584d77",
+            "name": "Output",
+            "field": "answer_options",
+            "type": "expression",
+            "defaultValue": ""
+          },
+          {
+            "id": "2c712973-3d98-499b-bffe-d8d020d7ed65",
+            "type": "expression",
+            "field": "documents_required",
+            "name": "Output"
+          },
+          {
+            "id": "6cc3477b-b481-4e6f-94e8-78f458426ffd",
+            "type": "expression",
+            "field": "stage",
+            "name": "Output"
+          }
+        ],
+        "rules": [
+          {
+            "_id": "de046838-506f-4cfd-8afa-cd6f5336bc26",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": "<-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'Sorry your policies with us implies you announce a claim before midnight of the day following the issue. To discuss exceptions, please call us'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "'[phone_number]'",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'complete_fail'"
+          },
+          {
+            "_id": "cb0d0c56-01e5-41fd-8199-7bae4404ffaa",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "Null",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'We are sorry you have to cancel your trip, what was the reason?'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "'[Covid, Hospital, Death]'",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'cancel_reason'"
+          },
+          {
+            "_id": "8d039063-81d8-4eeb-97d1-b58881042d05",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": "Null",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'We are sorry you have to cancel your trip. When did the issue happen?'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "'[date yyyy-mm-dd]'",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'cancel_date'"
+          },
+          {
+            "_id": "49a527df-ae75-4daa-bd19-f5fd3fd9d106",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'PassedAway'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "Null",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'Who are the people concerned?'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "'[Traveler, Relative, BusinessPartner, Other]'",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'ppl_concerned'"
+          },
+          {
+            "_id": "29f80409-e2f4-4e2e-856f-b3294e2aea70",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'Hospital'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "Null",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'Who are the people concerned?'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "'[Traveler, Relative, BusinessPartner, Other]'",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'ppl_concerned'"
+          },
+          {
+            "_id": "6774466a-becc-4979-818e-5aa4cf4ef4d6",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'Covid'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "Null",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'Who are the people concerned?'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "'[Traveler, Relative, BusinessPartner, Other]'",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'ppl_concerned'"
+          },
+          {
+            "_id": "1d3aebba-ddc6-42b6-ab34-1708733ccf0b",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'Other'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "Null",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'Your policy covers cases of death or hospitalisation only. To discuss exceptions, please call us'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "'[phone_number]'",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'complete_fail'"
+          },
+          {
+            "_id": "adf5dd49-12e7-40f5-a343-7bad02b9016e",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'PassedAway'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "'Traveler'",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'2 documents are necessary to process your claim: \n(1) The certificate of death, with the name of the person , \n(2) The Penalty Account Statement released by <Operator> \nPlease upload them directly here.'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "['Certif_Death', 'Penalty']",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'documents_input'"
+          },
+          {
+            "_id": "f2ffb7ed-a922-46ba-9041-25f19cc8e201",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'PassedAway'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "'Relative'",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'3 documents are necessary to process your claim: \n(1) The certificate of death, with the name of the person , \n(2) The Penalty Account Statement released by <Operator> , \n(3) An official document objectively attesting the link with a traveler (family certificate or other) \nPlease upload them directly here.'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "['Certif_Death', 'Penalty', 'Certif_Relative']",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'documents_input'"
+          },
+          {
+            "_id": "b289f78a-72bf-431c-8d62-056538747674",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">= -2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'PassedAway'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "'BusinessPartner'",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'3 documents are necessary to process your claim: \n(1) The certificate of death, with the name of the person , \n(2) The Penalty Account Statement released by <Operator> , \n(3) An official document attesting the business relationship (commerce register or job contract) \nPlease upload them directly here.'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "['Certif_Death', 'Penalty', 'Certif_Business']",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'documents_input'"
+          },
+          {
+            "_id": "5a1aef9a-dbfc-4db9-a4c0-6f45427fb4e9",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'Hospital'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "'Traveler'",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'2 documents are necessary to process your claim: \n(1) A document from the hospital, reporting the name of the person involved and the prognosis , \n(2) The Penalty Account Statement released by <Operator> \nPlease upload them directly here.'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "['Certif_Hospi', 'Penalty']",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'documents_input'"
+          },
+          {
+            "_id": "010a3b6a-9f33-44b3-812e-ce4f2325e2b6",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'Hospital'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "'Relative'",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'3 documents are necessary to process your claim: \n(1) A document from the hospital, reporting the name of the person involved and the prognosis , \n(2) The Penalty Account Statement released by <Operator> , \n(3) An official document objectively attesting the link with a traveler (family certificate or other) \nPlease upload them directly here.'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "['Certif_Hospi', 'Penalty', 'Certif_Relative']",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'documents_input'"
+          },
+          {
+            "_id": "96b49b74-77d3-4e1e-8857-eea0d08055ad",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">= -2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'Hospital'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "'BusinessPartner'",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'3 documents are necessary to process your claim: \n(1) A document from the hospital, reporting the name of the person involved and the prognosis , \n(2) The Penalty Account Statement released by <Operator> , \n(3) An official document attesting the business relationship (commerce register or job contract) \nPlease upload them directly here.'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "['Certif_Hospi', 'Penalty', 'Certif_Business']",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'documents_input'"
+          },
+          {
+            "_id": "475b5baa-d5d6-4436-9d48-49bcb21ae562",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'Covid'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "'Traveler'",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'2 documents are necessary to process your claim: \n(1) A document from the hospital, reporting the name of the person involved and the prognosis of Covid , \n(2) The Penalty Account Statement released by <Operator> \nPlease upload them directly here.'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "['Certif_Covid', 'Penalty']",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'documents_input'"
+          },
+          {
+            "_id": "cf4b2b59-b04a-4896-89bb-e87a8083ca1f",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">=-2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'Covid'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "'Relative'",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'3 documents are necessary to process your claim: \n(1) A document from the hospital, reporting the name of the person involved and the prognosis of Covid , \n(2) The Penalty Account Statement released by <Operator> , \n(3) An official document objectively attesting the link with a traveler (family certificate or other) \nPlease upload them directly here.'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "['Certif_Covid', 'Penalty', 'Certif_Relative']",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'documents_input'"
+          },
+          {
+            "_id": "92189ecc-1018-4965-9ffe-c5700deb5056",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "'Cancel'",
+            "3b873498-32d4-4768-b452-f74437dcae0d": ">= -2",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "'Covid'",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "'BusinessPartner'",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'3 documents are necessary to process your claim: \n(1) A document from the hospital, reporting the name of the person involved and the prognosis of Covid , \n(2) The Penalty Account Statement released by <Operator> , \n(3) An official document attesting the business relationship (commerce register or job contract) \nPlease upload them directly here.'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "['Certif_Covid', 'Penalty', 'Certif_Business']",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'documents_input'"
+          },
+          {
+            "_id": "06182d1b-f137-4e90-b726-0274f4ce2b7c",
+            "_description": "",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "Null",
+            "3b873498-32d4-4768-b452-f74437dcae0d": "",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "'Please let us know what is your claim about? \n(1) Cancellation,\n(2) Baggage Loss,\n(3) Flight Delay\n'",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "'[Cancel, Loss, Delay]'",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": "'claim'"
+          },
+          {
+            "_id": "dc248c9e-a2ef-4395-971e-a0d07103cbfe",
+            "80c2364a-d75d-4a29-addc-e8682dcf069a": "",
+            "3b873498-32d4-4768-b452-f74437dcae0d": "",
+            "fa773a81-3d65-4fba-a3a7-905a8b1fd694": "",
+            "0257c01e-6955-4a7f-ab95-35bbabbb24f9": "",
+            "562fbf68-e03f-404e-8c95-ea2c4c70aa8f": "",
+            "7fc7bfb9-53a2-4e13-8d29-905095584d77": "",
+            "2c712973-3d98-499b-bffe-d8d020d7ed65": "",
+            "6cc3477b-b481-4e6f-94e8-78f458426ffd": ""
+          }
+        ]
+      },
+      "id": "d2e03945-7029-41a9-9aae-eb471e39ac6a",
+      "position": {
+        "x": 245,
+        "y": 300
+      },
+      "type": "decisionTableNode"
+    },
+    {
+      "name": "Delay_Decision_Table",
+      "content": {
+        "hitPolicy": "first",
+        "inputs": [
+          {
+            "id": "a76051aa-2161-47ab-9cf4-add2861734e9",
+            "name": "Input",
+            "type": "expression"
+          }
+        ],
+        "outputs": [
+          {
+            "field": "output",
+            "id": "226d074f-687d-419c-9f68-61e0e0e15070",
+            "name": "Output",
+            "type": "expression"
+          }
+        ],
+        "rules": []
+      },
+      "id": "58d35a0a-d988-4a93-9a29-3c1a172054aa",
+      "position": {
+        "x": 1170,
+        "y": 290
+      },
+      "type": "decisionTableNode"
+    },
+    {
+      "name": "Loss_Decision_Table",
+      "content": {
+        "hitPolicy": "first",
+        "inputs": [
+          {
+            "id": "6a81345b-e211-424a-ace8-a8dcfd191ac1",
+            "name": "Input",
+            "type": "expression"
+          }
+        ],
+        "outputs": [
+          {
+            "field": "output",
+            "id": "7fd1aade-0513-4ddc-8844-dac5309d97c3",
+            "name": "Output",
+            "type": "expression"
+          }
+        ],
+        "rules": []
+      },
+      "id": "1f25e9c6-7545-44aa-be6e-c238cd29d3cf",
+      "position": {
+        "x": 1995,
+        "y": 290
+      },
+      "type": "decisionTableNode"
+    },
+    {
+      "name": "myResponse",
+      "id": "c4901d61-68a7-4160-9a5b-ecdd188d1df9",
+      "position": {
+        "x": 1725,
+        "y": -45
+      },
+      "type": "outputNode"
+    },
+    {
+      "name": "Doc_Validation",
+      "content": "/**\r\n * @param input\r\n * @param {{\r\n *  dayjs: import('dayjs')\r\n *  Big: import('big.js').BigConstructor\r\n * }} helpers\r\n */\r\nconst handler = (input, { dayjs, Big }) => {\r\n\r\n  try {\r\n\r\n  console.log(Object.keys(input).length);\r\n\r\n  if (! 'documents_required' in input ) {return input}\r\n  \r\n\r\n  const doc_validation = [];\r\n  const doc_missing = [];\r\n\r\n  for (var i = 0; i < input.documents_required.length; i++) { \r\n    //console.log(input.documents_input[input.documents_required[i]]);\r\n    doc_validation.push(input.documents_input[input.documents_required[i]]);\r\n\r\n    if (!input.documents_input[input.documents_required[i]]) {\r\n      doc_missing.push(input.documents_required[i]);\r\n      }\r\n    \r\n    };\r\n\r\n  var doc_validation_final = false;\r\n  doc_validation_final = doc_validation.every(Boolean);\r\n  \r\n  console.log(doc_validation_final);\r\n  console.log(doc_missing);\r\n\r\n  if (doc_missing.length > 0) {\r\n    input.message = `Sorry we were not able to validate the ${doc_missing.length} following documents: ${doc_missing}.\r\n    Please try again or contact our operator at this number.` ;\r\n    \r\n    input.stage = 'documents_input';\r\n    }\r\n  else {\r\n    input.message = 'Great, we validated all your documents and we are happy to confirm that your claim is valid and you will get reimbursed.';\r\n\r\n    input.stage = 'complete_success';\r\n  }\r\n\r\n  \r\n  console.log(input.message);\r\n\r\n  return {\r\n    ...input,\r\n    doc_validation_final,\r\n    doc_missing\r\n\r\n  };\r\n\r\n  }\r\n\r\n  catch {\r\n   return input\r\n  }\r\n} ",
+      "id": "c14c544e-b5a9-47d7-99a2-4d405e8fc758",
+      "position": {
+        "x": 1395,
+        "y": 40
+      },
+      "type": "functionNode"
+    }
+  ],
+  "edges": [
+    {
+      "id": "99701dd5-0ebb-4032-8b0c-e0aaf1d23941",
+      "sourceId": "faf3d09c-0048-4623-87e6-812eb3f85488",
+      "type": "edge",
+      "targetId": "d2e03945-7029-41a9-9aae-eb471e39ac6a"
+    },
+    {
+      "id": "5cebb8f9-4767-4ba4-bcf6-417c2e690c4d",
+      "sourceId": "d2e03945-7029-41a9-9aae-eb471e39ac6a",
+      "type": "edge",
+      "targetId": "c14c544e-b5a9-47d7-99a2-4d405e8fc758"
+    },
+    {
+      "id": "43a685c9-c466-42cb-92ae-08681e5af263",
+      "sourceId": "c14c544e-b5a9-47d7-99a2-4d405e8fc758",
+      "type": "edge",
+      "targetId": "c4901d61-68a7-4160-9a5b-ecdd188d1df9"
+    },
+    {
+      "id": "c928e2c5-8c50-45c2-98a4-4af42ca86c79",
+      "sourceId": "85fea211-3360-4c0e-9e8d-5d518520210a",
+      "type": "edge",
+      "targetId": "c14c544e-b5a9-47d7-99a2-4d405e8fc758"
+    },
+    {
+      "id": "88ab6d06-1868-46e4-9b8c-588576b6fb44",
+      "sourceId": "85fea211-3360-4c0e-9e8d-5d518520210a",
+      "type": "edge",
+      "targetId": "faf3d09c-0048-4623-87e6-812eb3f85488"
+    }
+  ]
+}
